@@ -40,9 +40,32 @@ Die automatische Umwandlung der Zeichen soll einige Schritte bei der Erstellung 
 
 ## Nutzung
 
-`python3 Scan2SVG.py -A a.jpg -B b.jpg -C c.jpg -t 160 -p Dateien -o Ordner -n Hand2Font -v 2`
+Vorausgesetzt die passenden Module für die beiden Skripte sind vorhanden:
 
+`python3 Scan2SVG.py -A a.jpg -B b.jpg -C c.jpg -t 160 -p Dateimuster -o Ordner -n Hand2Font -v 2`
 
+`python3`: Ja, klar. Wobei leider python2 ebenfalls vorhanden sein sollte, zumindest für den zweiten Schritt und eben das zweite Skript, da dieses  `import fontforge` benötigt. `Scan2SVG.py` (python3) | `SVG2Font.py` (python2).
+
+`Scan2SVG.py`: Skriptteil 1, welcher auch einzeln verwendet werden kann um die Zeicheninhalte zu vektorisieren.
+
+`-A a.jpg -B b.jpg -C c.jpg`: Scans der Vorlagenblätter. Blatt {A,B,C}.
+
+`-t 160`: Schwellwert hinsichtlich der Umwandlung (Kastenerkennung). Zwischen 0 und 255, wobei ich für den Standard ca. um die 160 vorschlagen würde.
+
+`-p Dateimuster`: Dateinamenmuster der zu erstellenden Bilddateien für die einzelnen Kästcheninhalte.
+
+`-o Ordner`: Ordnername und Ziel, in welchem die Dateien abgelegt werden.
+
+`-n Hand2Font`: Wie soll der Font später heißen?
+
+`-v 2`: welche Version zur Erfassung der Zeichen wurde verwendet?
+
+## Bogen zur Erfassung
+
+Zur Erfassung der Zeichen wird folgende Vorlage verwendet:
+
+* Hand2Font-02.pdf (`--version 2`, 149 Zeichen)
+* Hand2Font-01.pdf (`--version 1`, 139 Zeichen)
 
 ## Lizenz
 
