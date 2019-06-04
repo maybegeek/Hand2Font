@@ -16,26 +16,30 @@ ap.add_argument("-p", "--pattern", help="Namensaufbau für Output-Dateien.", req
 ap.add_argument("-o", "--output", help="Zielordner", required=True, type=str)
 ap.add_argument("-n", "--name", help="Name der Schrift", required=False, type=str)
 ap.add_argument("-v", "--version", help="Version des Eingabebogens.", required=False, type=int)
-args = vars(ap.parse_args())
+ap.add_argument("--rmppm", help="PPM-Dateien löschen.", action="store_true")
+ap.add_argument("--rmjpg", help="JPG-Dateien löschen.", action="store_true")
+ap.add_argument("--rmsvg", help="SVG-Dateien löschen.", action="store_true")
 
-t = args["threshold"]
-naming = args["pattern"]
-pathWD = args["output"]
+args = ap.parse_args()
+
+t = args.threshold
+naming = args.pattern
+pathWD = args.output
 pathWD = pathWD.rstrip('/') + '/'
-name = args["name"]
-version = args["version"]
+name = args.name
+version = args.version
 
 images_list = []
-if args["blattA"]:
-    images_list.append(args["blattA"])
+if args.blattA:
+    images_list.append(args.blattA)
 else:
     images_list.append(False)
-if args["blattB"]:
-    images_list.append(args["blattB"])
+if args.blattB:
+    images_list.append(args.blattB)
 else:
     images_list.append(False)
-if args["blattC"]:
-    images_list.append(args["blattC"])
+if args.blattC:
+    images_list.append(args.blattC)
 else:
     images_list.append(False)
 
@@ -122,12 +126,6 @@ for f in filesPPM:
     new_name = pathWD + os.path.splitext(os.path.basename(f))[0] + '.svg'
     potrace(f, new_name)
 
-for rmJPG in filesJPG:
-    os.remove(rmJPG)
-
-for rmPPM in filesPPM:
-    os.remove(rmPPM)
-
 print('Dateien aus Scan extrahiert und umgewandelt.')
 
 if name and version:
@@ -140,3 +138,22 @@ if name and version:
     print("* Schriftname: " + name)
     print("...")
     print("Viel Vergnügen bei den weiteren Schrifterstellungsschritten.")
+
+#
+# tidy up
+#
+# ggfs. ppm-Dateien löschen
+if args.rmppm:
+    for rmPPM in filesPPM:
+        os.remove(rmPPM)
+
+# ggfs. jpg-Dateien löschen
+if args.rmjpg:
+    for rmJPG in filesJPG:
+        os.remove(rmJPG)
+
+# ggfs. svg-Dateien löschen
+if args.rmsvg:
+    filesSVG = [f for f in glob.glob(pathWD + "*.svg")]
+    for rmSVG in filesSVG:
+        os.remove(rmSVG)
