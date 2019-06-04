@@ -2,7 +2,7 @@
 
 Von handgekritzelten Zeichen zum weiterbearbeitbaren Font. Drei Blatt mit je 49 Kästchen stehen bereit für die jeweils eigene Umsetzung der jeweiligen Zeichen. Sind die Kästchen ausgefüllt, können die Bögen gescannt werden -- bei **600dpi**, in **Graustufen** und im **jpg-Format**.
 
-Die vorliegenden Bögen können dann umgewandelt werden. Dabei werden die Kästchen per `opencv` erkannt, der Inhalt der Boxen dann ausgeschnitten und die vorliegenden Einzelbilder der Kästcheninhalte werden umgewandelt in `*.ppm`-Dateien um diese dann per `potrace` zu vektorisieren.
+Die vorliegenden Bögen können dann umgewandelt werden. Dabei werden die Kästchen per `opencv` erkannt, der Inhalt der Boxen dann ausgeschnitten und die vorliegenden Einzelbilder der Kästcheninhalte umgewandelt in `*.ppm`-Dateien um diese dann per `potrace` zu vektorisieren.
 
 Je nach Verwendung bestimmter Versionen zur Erfassung (version={1,2}) können damit `139` oder `149` Zeichen erfasst werden. Die erstellten `*.svg`-Dateien werden im nächsten Schritt an vorgesehenen Positionen im `Font` platziert.
 
