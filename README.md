@@ -67,6 +67,17 @@ Zur Erfassung der Zeichen wird folgende Vorlage verwendet:
 * [Hand2Font-02.pdf](Hand2Font-02.pdf) (`--version 2`, 149 Zeichen)
 * Hand2Font-01.pdf (`--version 1`, 139 Zeichen)
 
+Ausgefüllt könnte dies dann so aussehen:
+
+![Vorlage-Beispiel.jpg](Vorlage-Beispiel.jpg)
+
+## Beispielergebnis in Bildern
+
+![Font-Beispiel-Glyphen.jpg](Font-Beispiel-Glyphen.jpg)
+
+![Font-Beispiel-Lookups.jpg](Font-Beispiel-Lookups.jpg)
+
+
 ## Lizenz
 
 [CC-BY-NC-SA-4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
