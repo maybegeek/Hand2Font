@@ -73,9 +73,7 @@ Ausgefüllt könnte dies dann so aussehen:
 
 ## Beispielergebnis in Bildern
 
-![Font-Beispiel-Glyphen.jpg](Font-Beispiel-Glyphen.jpg)
-
-![Font-Beispiel-Lookups.jpg](Font-Beispiel-Lookups.jpg)
+![Font-Beispiel.jpg](Font-Beispiel.jpg)
 
 
 ## Lizenz
