@@ -44,7 +44,7 @@ Vorausgesetzt die passenden Module für die beiden Skripte sind vorhanden:
 
 `python3 Scan2SVG.py -A a.jpg -B b.jpg -C c.jpg -t 160 -p Dateimuster -o Ordner -n Hand2Font -v 2`
 
-`python3`: Ja, klar. Wobei leider python2 ebenfalls vorhanden sein sollte, zumindest für den zweiten Schritt und eben das zweite Skript, da dieses  `import fontforge` benötigt. `Scan2SVG.py` (python3) | `SVG2Font.py` (python2).
+`python3`: Ja, klar. Wobei python2 ebenfalls vorhanden sein sollte, zumindest für den zweiten Schritt und eben das zweite Skript, da dieses  `import fontforge` benötigt, bzw. `Fontforge` selbst die python3-Migration noch nicht abgeschlossen hat. `Scan2SVG.py` (python3) | `SVG2Font.py` (python2).
 
 `Scan2SVG.py`: Skriptteil 1, welcher auch einzeln verwendet werden kann um die Zeicheninhalte zu vektorisieren.
 
