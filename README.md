@@ -64,7 +64,7 @@ Vorausgesetzt die passenden Module für die beiden Skripte sind vorhanden:
 
 Zur Erfassung der Zeichen wird folgende Vorlage verwendet:
 
-* Hand2Font-02.pdf (`--version 2`, 149 Zeichen)
+* [Hand2Font-02.pdf](Hand2Font-02.pdf) (`--version 2`, 149 Zeichen)
 * Hand2Font-01.pdf (`--version 1`, 139 Zeichen)
 
 ## Lizenz
