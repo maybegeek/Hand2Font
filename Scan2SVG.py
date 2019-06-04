@@ -136,7 +136,7 @@ if name and version:
     print("fertig!")
     print("...")
     print("* im Ordner: " + pathWD + "liegt: " + name + "-Regular.sfd")
-    print("* Version " + version + " des Eingabebogens wurde verwendet")
+    print("* Version " + str(version) + " des Eingabebogens wurde verwendet")
     print("* Schriftname: " + name)
     print("...")
     print("Viel Vergnügen bei den weiteren Schrifterstellungsschritten.")
