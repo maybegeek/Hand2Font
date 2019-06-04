@@ -2,7 +2,7 @@
 
 Von handgekritzelten Zeichen zum weiterbearbeitbaren Font. Drei Blatt mit je 49 Kästchen stehen bereit für die jeweils eigene Umsetzung der jeweiligen Zeichen. Sind die Kästchen ausgefüllt, können die Bögen gescannt werden -- bei **600dpi**, in **Graustufen** und im **jpg-Format**.
 
-Die vorliegenden Bögen können dann umgewandelt werden. Dabei werden die Kästchen per `opencv` erkannt, der Inhalt der Boxen dann ausgeschnitten und die vorliegenden Einzelbilder der Kästcheninhalte werden dann umgewandelt in `*.ppm`-Dateien um diese dann per `potrace` zu vektorisieren.
+Die vorliegenden Bögen können dann umgewandelt werden. Dabei werden die Kästchen per `opencv` erkannt, der Inhalt der Boxen dann ausgeschnitten und die vorliegenden Einzelbilder der Kästcheninhalte werden umgewandelt in `*.ppm`-Dateien um diese dann per `potrace` zu vektorisieren.
 
 Je nach Verwendung bestimmter Versionen zur Erfassung (version={1,2}) können damit `139` oder `149` Zeichen erfasst werden. Die erstellten `*.svg`-Dateien werden im nächsten Schritt an vorgesehenen Positionen im `Font` platziert.
 
@@ -35,7 +35,7 @@ Bei der Erstellung des Fonts werden zu den eigenen Zeichen noch weitere Einstell
 
 Wie nicht unschwer zu erkennen, waren und sind unterschiedliche Teile dieses Projekts auch für das eigene Lernen hinsichtlich `python`, `opencv`, `Fontforge` und Typografie im allgemeinen interessant.
 
-Die automatische Umwandlung der Zeichen soll einige Schritte bei der Erstellung einer eigenen Schrift mit `Fontforge` beschleunigen. Es wartet auf jeden Interessierten aber noch genügend (Fein-)Arbeit bei der Verbesserung der automatisch erstellen `*.sfd`-Datei.
+Die automatische Umwandlung der Zeichen soll einige Schritte bei der Erstellung einer eigenen Schrift mit `Fontforge` beschleunigen. Es wartet auf jeden Interessierten aber noch genügend (Fein-)Arbeit bei der Verbesserung der automatisch erstellten `*.sfd`-Datei.
 
 
 ## Nutzung
