@@ -60,6 +60,12 @@ Vorausgesetzt die passenden Module für die beiden Skripte sind vorhanden:
 
 `-v 2`: welche Version zur Erfassung der Zeichen wurde verwendet?
 
+`--rmppm`: *.ppm-Dateien im Erstellungsordner entfernen.
+
+`--rmjpg`: *.jpg-Dateien im Erstellungsordner entfernen.
+
+`--rmsvg`: *.svg-Dateien im Erstellungsordner entfernen.
+
 ## Bogen zur Erfassung
 
 Zur Erfassung der Zeichen wird folgende Vorlage verwendet:
