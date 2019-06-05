@@ -1,39 +1,50 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""Import vorliegender SVG-Dateien und Erstellung einer Font-Datei."""
 
-import fontforge
+import os
 import sys
 import math
-import os
 import glob
 import psMat
+import fontforge
 import tempfile
 import argparse
+
+__author__ = "Christoph Pfeiffer"
+__license__ = "CC-BY-NC-SA-4.0"
 
 ap = argparse.ArgumentParser(description='Import der SVG-Dateien in FontForge ... + magic.')
 ap.add_argument('-svg', '--svgordner', help='Ordner der SVG-Dateien.', type=str, required=True)
 ap.add_argument("-n", "--name", help="Name der Schrift.", required=True, type=str)
 ap.add_argument("-v", "--version", help="Version des Eingabebogens.", required=True, type=int)
-args = vars(ap.parse_args())
 
-pfad = args["svgordner"]
+args = ap.parse_args()
+
+pfad = args.svgordner
 pfad = pfad.rstrip('/') + '/'
-name = args["name"]
-version = args["version"]
+name = args.name
+version = args.version
 
 glyphsSVG = [f for f in glob.glob(pfad + "*.svg")]
 glyphsSVG.sort()
 
+# Reihenfolge der Glyphen.
+# Für die unterschiedlichen Versionen der Erfassungsbögen
 if version == 1:
   glyphsUTF8 = [['A', 65], ['H', 72], ['O', 79], ['V', 86], ['Ü', 220], ['f', 102], ['m', 109], ['B', 66], ['I', 73], ['P', 80], ['W', 87], ['ẞ', 7838], ['g', 103], ['n', 110], ['C', 67], ['J', 74], ['Q', 81], ['X', 88], ['a', 97], ['h', 104], ['o', 111], ['D', 68], ['K', 75], ['R', 82], ['Y', 89], ['b', 98], ['i', 105], ['p', 112], ['E', 69], ['L', 76], ['S', 83], ['Z', 90], ['c', 99], ['j', 106], ['q', 113], ['F', 70], ['M', 77], ['T', 84], ['Ä', 196], ['d', 100], ['k', 107], ['r', 114], ['G', 71], ['N', 78], ['U', 85], ['Ö', 214], ['e', 101], ['l', 108], ['s', 115], ['t', 116], ['ä', 228], ['4', 52], ['!', 33], ['(', 40], ['<', 60], ['.', 46], ['u', 117], ['ö', 246], ['5', 53], ['?', 63], [')', 41], ['>', 62], [':', 58], ['v', 118], ['ü', 252], ['6', 54], ['§', 167], ['{', 123], ['|', 124], ['-', 45], ['w', 119], ['ß', 223], ['7', 55], ['$', 36], ['}', 125], ['\\', 92], ['–', 8211], ['x', 120], ['1', 49], ['8', 56], ['%', 37], ['[', 91], [',', 44], ['#', 35], ['y', 121], ['2', 50], ['9', 57], ['&', 38], [']', 93], [';', 59], ['+', 43], ['z', 122], ['3', 51], ['0', 48], ['/', 47], ['=', 61], ['*', 42], ['~', 126], ['"', 34], ['«', 171], ['„', 8222], ['ﬃ', 64259], ['a.ss02', 993071], ['o.ss01', 993078], ["'", 39], ['»', 187], ['“', 8220], ['c_k.liga', 993082], ['d.ss01', 993072], ['r.ss01', 993079], ['@', 64], ['¼', 188], ['…', 8230], ['Q_u.liga', 993083], ['e.ss01', 993073], ['s.ss01', 993080], ['^', 94], ['½', 189], ['€', 8364], ['s_s.liga', 993084], ['e.ss02', 993074], ['t.ss01', 993081], ['_', 95], ['¾', 190], ['ﬀ', 64256], ['e_i.liga', 993085], ['i.ss01', 993075], ['`', 96], ['‚', 8218], ['ﬁ', 64257], ['t_t.liga', 993086], ['m.ss01', 993076], ['·', 183], ['‘', 8216], ['ﬂ', 64258], ['a.ss01', 993070], ['n.ss01', 993077]]
 elif version == 2:
   glyphsUTF8 = [['A', 65], ['H', 72], ['O', 79], ['V', 86], ['Ü', 220], ['f', 102], ['m', 109], ['B', 66], ['I', 73], ['P', 80], ['W', 87], ['ẞ', 7838], ['g', 103], ['n', 110], ['C', 67], ['J', 74], ['Q', 81], ['X', 88], ['a', 97], ['h', 104], ['o', 111], ['D', 68], ['K', 75], ['R', 82], ['Y', 89], ['b', 98], ['i', 105], ['p', 112], ['E', 69], ['L', 76], ['S', 83], ['Z', 90], ['c', 99], ['j', 106], ['q', 113], ['F', 70], ['M', 77], ['T', 84], ['Ä', 196], ['d', 100], ['k', 107], ['r', 114], ['G', 71], ['N', 78], ['U', 85], ['Ö', 214], ['e', 101], ['l', 108], ['s', 115], ['t', 116], ['ä', 228], ['4', 52], ['!', 33], ['(', 40], ['<', 60], ['.', 46], ['u', 117], ['ö', 246], ['5', 53], ['?', 63], [')', 41], ['>', 62], [':', 58], ['v', 118], ['ü', 252], ['6', 54], ['§', 167], ['{', 123], ['|', 124], ['-', 45], ['w', 119], ['ß', 223], ['7', 55], ['$', 36], ['}', 125], ['\\', 92], ['–', 8211], ['x', 120], ['1', 49], ['8', 56], ['%', 37], ['[', 91], [',', 44], ['#', 35], ['y', 121], ['2', 50], ['9', 57], ['&', 38], [']', 93], [';', 59], ['+', 43], ['z', 122], ['3', 51], ['0', 48], ['/', 47], ['=', 61], ['*', 42], ['~', 126], ['"', 34], ['«', 171], ['„', 8222], ['ﬃ', 64259], ['a.ss02', 993071], ['o.ss01', 993078], ['paragraph', 0xb6], ["'", 39], ['»', 187], ['“', 8220], ['c_k.liga', 993082], ['d.ss01', 993072], ['r.ss01', 993079], ['divide', 0xf7], ['@', 64], ['¼', 188], ['…', 8230], ['Q_u.liga', 993083], ['e.ss01', 993073], ['s.ss01', 993080], ['multiply', 0xd7], ['^', 94], ['½', 189], ['€', 8364], ['s_s.liga', 993084], ['e.ss02', 993074], ['t.ss01', 993081], ['uni203d', 0x203d], ['_', 95], ['¾', 190], ['ﬀ', 64256], ['e_i.liga', 993085], ['i.ss01', 993075], ['copyright', 0xa9], ['arrowright', 0x2192], ['`', 96], ['‚', 8218], ['ﬁ', 64257], ['t_t.liga', 993086], ['m.ss01', 993076], ['registered', 0xae], ['arrowleft', 0x2190], ['·', 183], ['‘', 8216], ['ﬂ', 64258], ['a.ss01', 993070], ['n.ss01', 993077], ['logicalnot', 0xac] , ['long', 0x17f]]
 
+# grobe Überprüfung, ob soviele SVG-Dateien da sind,
+# wie im FOnt platziert werden sollen.
 if len(glyphsSVG) == len(glyphsUTF8):
     print('könnte passen ... los gehts!')
 elif len(glyphsSVG) != len(glyphsUTF8):
     print('ungleiche Ausgangslage!')
     exit()
 
+# Font-Erstellung + einige Einstellungen.
 font = fontforge.font()
 font.encoding = 'UnicodeFull'
 font.version = '1.0'
@@ -67,6 +78,7 @@ font.addLookupSubtable('extra-ligatures', 'dlig')
 # weitere ausprobieren
 # https://github.com/fontforge/fontforge/issues/2988
 
+# Ein paar Leerzeichen.
 # NUL, Default Character
 char = font.createChar( 0x0 )
 char.width = 390
@@ -98,7 +110,7 @@ char.width = 10
 char = font.createChar( 0x202f, 'uni202F' )
 char.width = 390
 
-
+# Glyphen platzieren
 for i, f in enumerate(glyphsSVG):
     if glyphsUTF8[i][1] < 993000:
         char = font.createChar( glyphsUTF8[i][1] )
@@ -110,7 +122,8 @@ for i, f in enumerate(glyphsSVG):
     char.round()
     char.addExtrema()
 
-
+# Konturen der Katzenpfoten ... und damit eine Möglichkeit
+# des Einbettens von Zeicheninformationen im Skript
 contour01 = [[5300.34, 1036.19],
 [5320.85, 1019.84, 5347.91, 992.853, 5338.59, 953.574], [5325.98, 900.205, 5264.84, 868.537, 5193.96, 870.44], [5133.45, 872.166, 5081.55, 897.599, 5055.28, 938.638], [5026.91, 983.048, 5057.27, 1029.44, 5092.14, 1050.5], [5153.45, 1087.86, 5250.42, 1076.07, 5300.34, 1036.19]]
 
@@ -122,15 +135,15 @@ contour04 = [[4917.68, 1456.77], [4986.21, 1474.46, 5056.17, 1448.3, 5044.79, 13
 
 contour05 = [[4908.21, 966.015], [4877.98, 908.501, 4771.38, 802.499, 4682.57, 770.841], [4624.39, 750.075, 4581.83, 782.293, 4576.26, 835.201], [4574.22, 854.653, 4576.22, 865.482, 4591.15, 913.988], [4620.39, 1008.83, 4607.97, 1034.68, 4571.12, 1107.96], [4551.29, 1147.38, 4545.49, 1162.46, 4541.3, 1185.06], [4531.02, 1238.7, 4571.51, 1275.11, 4613.3, 1279.51], [4627.5, 1281, 4664.7, 1276.1, 4693.07, 1269.07], [4735.43, 1258.68, 4778.97, 1240.45, 4821.67, 1215.38], [4896.71, 1171.47, 4960.91, 1066.09, 4908.21, 966.015]]
 
-
+# Eine Pfote
 contours = []
-
 contours.append(contour01)
 contours.append(contour02)
 contours.append(contour03)
 contours.append(contour04)
 contours.append(contour05)
 
+# Erstellen der Einzelpfote als Zeichen
 pfote = font.createChar(0xF273F, "pfote")
 pfote.comment = u'Gerne den Vorschlag von Christine Fraunhofer hier umgesetzt!'
 pen = pfote.glyphPen();
@@ -145,6 +158,7 @@ for i, cnts in enumerate(contours):
                 pen.closePath()
 pen = None
 
+# Nun Einzelpfote kopieren, drehen ändern und ein weiteres Zeichen erstellen.
 pfote.left_side_bearing = pfote.right_side_bearing = 120
 t1 = psMat.compose(psMat.rotate(math.radians(2)), psMat.translate(0, -50))
 t2 = psMat.compose(psMat.scale(0.95), psMat.translate(-1500, -500))
@@ -159,7 +173,8 @@ pfotelig.unlinkRef
 pfotelig.left_side_bearing = pfotelig.right_side_bearing = 240
 pfotelig.comment = u'Hier wurde die Pfote aus "pfote" übernommen, vervielfältigt und transformiert.'
 
-
+# Weitere Methode zur Einbettung eines Zeichens:
+# SVG inline + tempfile
 svg_notdef = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE svg  PUBLIC "-//W3C//DTD SVG 1.1//EN"  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" viewBox="0 -410 1437 2048" xmlns="http://www.w3.org/2000/svg">
@@ -175,7 +190,7 @@ gl_notdef = font.createChar(0x25A1, '.notdef')
 gl_notdef.importOutlines( temp.name )
 gl_notdef.left_side_bearing = gl_notdef.right_side_bearing = 90
 
-
+# Stylistic Sets, normale und besondere Ligaturen.
 # ss01
 char = font.createChar(0x61)
 char.addPosSub('ss01', 'a.ss01')
@@ -227,6 +242,8 @@ char.addPosSub('dlig', tuple(['e', 'i']))
 char = font.createChar(0xF273E)
 char.addPosSub('dlig', tuple(['t', 't']))
 
+# Hier der Versuch bestimmte durchschnittliche Annahmen über die Zeichengrößen
+# automagisch umzusetzen.
 # get Font-Spezifika
 fEm = font.em
 fDesc = font.descent

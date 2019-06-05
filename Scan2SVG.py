@@ -142,7 +142,7 @@ print('Zeichen aus Scan extrahiert und vektorisiert.')
 
 # falls `name` und `version` als Argument gegeben sind wird dann auch noch die Umwandlung in einen Font angegangen (`SVG2Font.py` mit Argumenten aufgerufen)
 if name and version:
-    print('Font wird erstellt, da --name und --version angebeben wurden ...')
+    print('\nNun wird der Font erstellt, \nda --name und --version angebeben wurden:')
     subprocess.check_call(["python2", "SVG2Font.py", "--name", name, "--version", str(version), "--svgordner", pathWD])
     print("... fertig!\n")
     print("* Erfassungsbogen in Version: " + str(version))
