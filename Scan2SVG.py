@@ -27,6 +27,7 @@ ap.add_argument("-v", "--version", help="Version des Eingabebogens.", required=F
 ap.add_argument("--rmppm", help="PPM-Dateien löschen.", action="store_true")
 ap.add_argument("--rmjpg", help="JPG-Dateien löschen.", action="store_true")
 ap.add_argument("--rmsvg", help="SVG-Dateien löschen.", action="store_true")
+ap.add_argument("--buntstift", help="Buntstift.", required=False, type=str)
 
 args = ap.parse_args()
 
@@ -36,6 +37,7 @@ pathWD = args.output
 pathWD = pathWD.rstrip('/') + '/'
 name = args.name
 version = args.version
+buntstift = args.buntstift
 
 images_list = []
 if args.blattA:
@@ -133,7 +135,11 @@ for f in filesJPG:
 # PPM nach SVG konvertieren
 filesPPM = [f for f in glob.glob(pathWD + "*.ppm")]
 def potrace(input_fname, output_fname):
-    subprocess.check_call(['potrace', '--flat', '-s', input_fname, '-o', output_fname])
+    if buntstift:
+        subprocess.check_call(['potrace', '--flat', '--turdsize', '110', '-s', input_fname, '-o', output_fname, '--blacklevel', '0.96'])
+    else:
+        subprocess.check_call(['potrace', '--flat', '--turdsize', '110', '-s', input_fname, '-o', output_fname])
+        
 for f in filesPPM:
     new_name = pathWD + os.path.splitext(os.path.basename(f))[0] + '.svg'
     potrace(f, new_name)
