@@ -66,6 +66,8 @@ Vorausgesetzt die passenden Module für die beiden Skripte sind vorhanden:
 
 `--rmsvg`: *.svg-Dateien im Erstellungsordner entfernen.
 
+`--buntstift`: Buntstift, Farbe, uneinheitliche Deckkraft (resultiert in Verwendung von `--blacklevel 0.96`)
+
 ## Bogen zur Erfassung
 
 Zur Erfassung der Zeichen wird folgende Vorlage verwendet:
