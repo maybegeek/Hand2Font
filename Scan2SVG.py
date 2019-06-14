@@ -17,95 +17,125 @@ __license__ = "CC-BY-NC-SA-4.0"
 
 ap = argparse.ArgumentParser(description='Umwandlung jpg@600dpi in SVG-Dateien zum weiteren Import in FontForge.')
 ap.add_argument("-t", "--threshold", help="Schwellwert (1--255).", type=int, required=True)
-ap.add_argument("-A", "--blattA", help="Blatt A", required=False, type=str)
-ap.add_argument("-B", "--blattB", help="Blatt B", required=False, type=str)
-ap.add_argument("-C", "--blattC", help="Blatt C", required=False, type=str)
-ap.add_argument("-p", "--pattern", help="Namensaufbau für Output-Dateien.", required=True, type=str)
-ap.add_argument("-o", "--output", help="Zielordner", required=True, type=str)
-ap.add_argument("-n", "--name", help="Name der Schrift", required=False, type=str)
+ap.add_argument("-a", "--blattA", help="Blatt A", required=False, type=str)
+ap.add_argument("-b", "--blattB", help="Blatt B", required=False, type=str)
+ap.add_argument("-c", "--blattC", help="Blatt C", required=False, type=str)
+ap.add_argument("-s", "--scans", help="Ordner mit per Namen sortierten Scans (*.jpg)", required=False, type=str)
+ap.add_argument("-o", "--output", help="Zielordner", required=False, type=str)
+ap.add_argument("-n", "--name", help="NameDerSchrift", required=False, type=str)
 ap.add_argument("-v", "--version", help="Version des Eingabebogens.", required=False, type=int)
 ap.add_argument("--rmppm", help="PPM-Dateien löschen.", action="store_true")
 ap.add_argument("--rmjpg", help="JPG-Dateien löschen.", action="store_true")
 ap.add_argument("--rmsvg", help="SVG-Dateien löschen.", action="store_true")
 ap.add_argument("--buntstift", help="Buntstift, Farbe, uneinheitliche Deckkraft.", action="store_true")
-ap.add_argument("--debug", help="Anzeige der erkannten Elemente an den Bildern.", action="store_true")
+ap.add_argument("--debug", help="Debug-Informationen.", action="store_true")
 
 args = ap.parse_args()
 
 t = args.threshold
-naming = args.pattern
-pathWD = args.output
-pathWD = pathWD.rstrip('/') + '/'
+
 name = args.name
 version = args.version
 pot_buntstift = args.buntstift
+show_debug = args.debug
 
-images_list = []
-if args.blattA:
-    images_list.append(args.blattA)
-else:
-    images_list.append(False)
-if args.blattB:
-    images_list.append(args.blattB)
-else:
-    images_list.append(False)
-if args.blattC:
-    images_list.append(args.blattC)
-else:
-    images_list.append(False)
+if args.scans :
+    sortedDir = args.scans
+    sortedDir = sortedDir.rstrip('/') + '/'
 
-# Output-Pfad/Ordner ggfs. anlegen
+if args.output :
+    pathWD = args.output
+    pathWD = pathWD.rstrip('/') + '/'
+elif args.scans :
+    pathWD = sortedDir + 'FONT/'
+else :
+    print('Keine Ordnerinformationen angegeben.')
+    exit()
+
+def get_contour_precedence(contour, cols) :
+    tolerance_factor = 100
+    origin = cv.boundingRect(contour)
+    return ((origin[1] // tolerance_factor) * tolerance_factor) * cols + origin[0]
+
+kern = cv.getStructuringElement(cv.MORPH_RECT,(11,11))
+
+if sortedDir :
+    filesSortedDir = [f for f in glob.glob(sortedDir + "*.jpg")]
+    filesSortedDir.sort()
+    images_list = filesSortedDir
+
+if images_list == None :
+    images_list = []
+    if args.blattA:
+        images_list.append(args.blattA)
+    else:
+        images_list.append(False)
+    if args.blattB:
+        images_list.append(args.blattB)
+    else:
+        images_list.append(False)
+    if args.blattC:
+        images_list.append(args.blattC)
+    else:
+        images_list.append(False)
+
 if not os.path.exists(pathWD):
     os.makedirs(pathWD)
 
 for stepper, image_from_list in enumerate(images_list):
-    # falls Blatt {A,B,C}
     if image_from_list == False:
         continue
-    # Bild/Scan importieren
-    img = cv.imread(image_from_list)
-    # debug
-    #bild = img.copy()
 
-    # Boxen haben ca. Min-/Max-Werte bzgl. DIN-A4.
+    img = cv.imread(image_from_list)
+
     minHoehe = img.shape[0] * 0.06
     minBreite = img.shape[1] * 0.06
     minFlaeche = minHoehe * minBreite
 
-    # Graustufen
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-    # Blur
     blur = cv.GaussianBlur(gray, (5, 5), 0)
-    # invers
-    (t, binary) = cv.threshold(blur, t, 255, cv.THRESH_BINARY_INV)
-    # Konturen finden
-    (contours, _) = cv.findContours(binary, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-    # Konturen sortieren (links->rechts, oben->unten)
-    # !!! funktioniert nicht immer, deswegen doch anderer Weg.
-    sorted_contours = sorted(contours, key=lambda ctr: cv.boundingRect(ctr)[0] + cv.boundingRect(ctr)[1] * img.shape[1] )
+    (_, binary) = cv.threshold(blur, t, 255, cv.THRESH_BINARY_INV)
+    binary = cv.morphologyEx(binary, cv.MORPH_CLOSE, kern)
 
-    # was nun tun mit den Schachteln
-    glyphBoxes = []
-    for i, cnt in enumerate(sorted_contours):
-        approx = cv.approxPolyDP(cnt,0.01*cv.arcLength(cnt,True),True)
-        if len(approx) == 4 and cv.contourArea(cnt) > minFlaeche :
-            glyphBoxes.append(cnt)
+    (contours, _) = cv.findContours(binary, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+
+    hand2FontBoxes = []
+    for i, contour in enumerate(contours) :
+        if 5000 < cv.contourArea(contour) :
+            approx = cv.approxPolyDP(contour,0.01*cv.arcLength(contour,True),True)
+            if len(approx) == 4 and cv.contourArea(contour) > minFlaeche :
+                hand2FontBoxes.append(contour)
+                #cv.drawContours(img, contour, -1, (0, 0, 255), 10)
+                #cv.fillPoly(img, pts =[contour], color=(133, 160, 22))
+
+    hand2FontBoxes.sort(key=lambda x:get_contour_precedence(x, img.shape[1]))
+
+    ## debug
+    #for i, cnt in enumerate(hand2FontBoxes) :
+    #    # compute the center of the contour
+    #    M = cv.moments(cnt)
+    #    cX = int(M["m10"] / M["m00"])
+    #    cY = int(M["m01"] / M["m00"])
+    #    cv.putText(img, str(i), (cX - 60, cY - 20), cv.FONT_HERSHEY_SIMPLEX, 4, (255, 255, 255), 10)
+
+    # debug einbauen!
+    #BILDA = cv.resize(BILD.copy(),None,fx=0.14,fy=0.14)
+    #cv.imshow('BLaBLaBLa',BILDA)
+    #cv.waitKey(0)
 
     targetBoxList = []
-    for i, box in enumerate(glyphBoxes):
+    for i, box in enumerate(hand2FontBoxes):
         x, y, w, h = cv.boundingRect(box)
         # debug
         #print("i: ", i, "\nx: ", x, "\ny: ", y, "\nw: ", w, "\nh: ", h, "\n")
 
-        # manuelle Korrektur:
+        # manuelle Korrektur bzgl. Inhalt der Box:
         y = int(round(y + (0.0433 * h)))
         x = int(round(x + (0.0433 * h)))
         h = int(round(h - (0.0693 * h)))
         w = int(round(w - (0.0693 * h)))
         boxInner = x, y, w, h
         targetBoxList.append(boxInner)
-
-    targetBoxSort = sorted(targetBoxList, key=lambda item: ( item[0]+(item[2]/2), item[1]+(item[3]/2) ))
 
     if stepper == 0:
         blattCounter = 1
@@ -114,11 +144,11 @@ for stepper, image_from_list in enumerate(images_list):
     elif stepper == 2:
         blattCounter = 99
 
-    for i, tbs in enumerate(targetBoxSort, blattCounter):
+    for i, tbs in enumerate(targetBoxList, blattCounter):
         # debug
         # print("i: ", i, "\nx: ", tbs[0], "\ny: ", tbs[1], "\nw: ", tbs[2], "\nh: ", tbs[3], "\n")
         subImg = img[tbs[1] : tbs[1] + tbs[3], tbs[0] : tbs[0] + tbs[2], :]
-        cv.imwrite(pathWD + naming + "-{:03}.jpg".format(i), subImg)
+        cv.imwrite(pathWD + name + "-{:03}.jpg".format(i), subImg)
 
     # debug
     #bild = cv.resize(img,None,fx=0.11,fy=0.11)
@@ -149,7 +179,7 @@ print('Zeichen aus Scan extrahiert und vektorisiert.')
 
 # falls `name` und `version` als Argument gegeben sind wird dann auch noch die Umwandlung in einen Font angegangen (`SVG2Font.py` mit Argumenten aufgerufen)
 if name and version:
-    print('\nNun wird der Font erstellt, \nda --name und --version angebeben wurden:')
+    print('\nNun wird der Font erstellt, \nda --name und --version angegeben wurden:')
     subprocess.check_call(["python2", "SVG2Font.py", "--name", name, "--version", str(version), "--svgordner", pathWD])
     print("... fertig!\n")
     print("* Erfassungsbogen in Version: " + str(version))
