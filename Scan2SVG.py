@@ -28,6 +28,7 @@ ap.add_argument("--rmppm", help="PPM-Dateien löschen.", action="store_true")
 ap.add_argument("--rmjpg", help="JPG-Dateien löschen.", action="store_true")
 ap.add_argument("--rmsvg", help="SVG-Dateien löschen.", action="store_true")
 ap.add_argument("--buntstift", help="Buntstift, Farbe, uneinheitliche Deckkraft.", action="store_true")
+ap.add_argument("--debug", help="Anzeige der erkannten Elemente an den Bildern.", action="store_true")
 
 args = ap.parse_args()
 
