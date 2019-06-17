@@ -16,7 +16,7 @@ __author__ = "Christoph Pfeiffer"
 __license__ = "CC-BY-NC-SA-4.0"
 
 ap = argparse.ArgumentParser(description='Umwandlung jpg@600dpi in SVG-Dateien zum weiteren Import in FontForge.')
-ap.add_argument("-t", "--threshold", help="Schwellwert (1--255).", type=int, required=True)
+ap.add_argument("-t", "--threshold", help="Schwellwert (1--255).", default=160, type=int, required=False)
 ap.add_argument("-a", "--blattA", help="Blatt A", required=False, type=str)
 ap.add_argument("-b", "--blattB", help="Blatt B", required=False, type=str)
 ap.add_argument("-c", "--blattC", help="Blatt C", required=False, type=str)
