@@ -53,7 +53,7 @@ else :
     exit()
 
 def get_contour_precedence(contour, cols) :
-    tolerance_factor = 100
+    tolerance_factor = 300
     origin = cv.boundingRect(contour)
     return ((origin[1] // tolerance_factor) * tolerance_factor) * cols + origin[0]
 
