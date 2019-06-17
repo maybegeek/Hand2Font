@@ -1,17 +1,25 @@
 import os
 import glob
 import cv2
+import argparse
 
+ap = argparse.ArgumentParser(description='DEBUG!!')
+ap.add_argument('-s', '--scans', help='Ordner der Scans.', type=str, required=True)
+
+args = ap.parse_args()
+
+pfad = args.scans
+pfad = pfad.rstrip('/') + '/'
 
 def get_contour_precedence(contour, cols):
-    tolerance_factor = 100
+    tolerance_factor = 300
     origin = cv2.boundingRect(contour)
     return ((origin[1] // tolerance_factor) * tolerance_factor) * cols + origin[0]
-    
-testBilder = [f for f in glob.glob("test/" + "*.jpg")]
+
+testBilder = [f for f in glob.glob( pfad + "*.jpg")]
 for f in testBilder :
     img = cv2.imread(f)
-    
+
     #cv2.putText(img, f, (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 4, (255, 0, 0), 10)
 
     minHoehe = img.shape[0] * 0.06
@@ -61,7 +69,7 @@ for f in testBilder :
         cX = int(M["m10"] / M["m00"])
         cY = int(M["m01"] / M["m00"])
         cv2.putText(img, str(i), (cX - 60, cY - 20), cv2.FONT_HERSHEY_SIMPLEX, 4, (255, 255, 255), 10)
-        
+
     ## debug
     #print("Konturen insgesamt: " + str(len(contours)) )
     #print("Konturen passend: " + str(len(eigenecnt)) )
