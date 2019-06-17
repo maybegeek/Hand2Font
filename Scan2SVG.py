@@ -167,7 +167,7 @@ for f in filesJPG:
 filesPPM = [f for f in glob.glob(pathWD + "*.ppm")]
 def potrace(input_fname, output_fname):
     if pot_buntstift:
-        subprocess.check_call(['potrace', '--flat', '--turdsize', '120', '--blacklevel', '0.96', '-s', input_fname, '-o', output_fname])
+        subprocess.check_call(['potrace', '--flat', '--longcurve', '--alphamax', '1.34', '--turdsize', '120', '--blacklevel', '0.95', '-s', input_fname, '-o', output_fname])
     else:
         subprocess.check_call(['potrace', '--flat', '--turdsize', '120', '-s', input_fname, '-o', output_fname])
 
