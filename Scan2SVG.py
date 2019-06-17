@@ -21,6 +21,7 @@ ap.add_argument("-a", "--blattA", help="Blatt A", required=False, type=str)
 ap.add_argument("-b", "--blattB", help="Blatt B", required=False, type=str)
 ap.add_argument("-c", "--blattC", help="Blatt C", required=False, type=str)
 ap.add_argument("-s", "--scans", help="Ordner mit per Namen sortierten Scans (*.jpg)", required=False, type=str)
+ap.add_argument("--blur", help="Weichzeichner", default=3, required=False, type=int)
 ap.add_argument("-o", "--output", help="Zielordner", required=False, type=str)
 ap.add_argument("-n", "--name", help="NameDerSchrift", required=False, type=str)
 ap.add_argument("-v", "--version", help="Version des Eingabebogens.", default=2, required=False, type=int)
@@ -35,6 +36,7 @@ args = ap.parse_args()
 t = args.threshold
 
 name = args.name
+blurring = args.blur
 version = args.version
 pot_buntstift = args.buntstift
 show_debug = args.debug
@@ -148,6 +150,8 @@ for stepper, image_from_list in enumerate(images_list):
         # debug
         # print("i: ", i, "\nx: ", tbs[0], "\ny: ", tbs[1], "\nw: ", tbs[2], "\nh: ", tbs[3], "\n")
         subImg = img[tbs[1] : tbs[1] + tbs[3], tbs[0] : tbs[0] + tbs[2], :]
+        if blurring :
+            subImg = cv.GaussianBlur(subImg, ( blurring , blurring ), 0)
         cv.imwrite(pathWD + name + "-{:03}.jpg".format(i), subImg)
 
     # debug
