@@ -190,6 +190,9 @@ if name and version:
     print("* Schriftname: " + name)
     print("* im Ordner: " + pathWD)
     print("* Dateiname: " + name + "-Regular.sfd")
+    info_datei = open(pathWD + "info.txt", "a")
+    info_datei.write(str(args))
+    info_datei.close()
 
 # tidy up
 # ggfs. ppm-Dateien löschen
