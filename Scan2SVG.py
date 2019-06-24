@@ -11,6 +11,8 @@ import subprocess
 import argparse
 import cv2 as cv
 from PIL import Image
+import numpy as np
+from skimage.morphology import skeletonize as skl
 
 __author__ = "Christoph Pfeiffer"
 __license__ = "CC-BY-NC-SA-4.0"
@@ -28,6 +30,7 @@ ap.add_argument("-v", "--version", help="Version des Eingabebogens.", default=2,
 ap.add_argument("--rmppm", help="PPM-Dateien löschen.", action="store_true")
 ap.add_argument("--rmjpg", help="JPG-Dateien löschen.", action="store_true")
 ap.add_argument("--rmsvg", help="SVG-Dateien löschen.", action="store_true")
+ap.add_argument("--skel", help="Skeletonization! Extra Font.", action="store_true")
 ap.add_argument("--buntstift", help="Buntstift, Farbe, uneinheitliche Deckkraft.", action="store_true")
 ap.add_argument("--debug", help="Debug-Informationen.", action="store_true")
 
@@ -40,6 +43,7 @@ blurring = args.blur
 version = args.version
 pot_buntstift = args.buntstift
 show_debug = args.debug
+do_skelet = args.skel
 
 if args.scans :
     sortedDir = args.scans
@@ -53,6 +57,8 @@ elif args.scans :
 else :
     print('Keine Ordnerinformationen angegeben.')
     exit()
+
+pathWDSKEL = pathWD + 'SKEL/'
 
 def get_contour_precedence(contour, cols) :
     tolerance_factor = 300
@@ -178,6 +184,57 @@ def potrace(input_fname, output_fname):
 for f in filesPPM:
     new_name = pathWD + os.path.splitext(os.path.basename(f))[0] + '.svg'
     potrace(f, new_name)
+
+
+
+# if `--skel`
+if args.skel :
+    if not os.path.exists(pathWDSKEL):
+        os.makedirs(pathWDSKEL)
+
+    filesJPG = [f for f in glob.glob(pathWD + "*.jpg")]
+    for f in filesJPG:
+        path = f
+        skelimg = cv.imread(path, 0)
+        skelimg = cv.bilateralFilter(skelimg, 5, 35, 10)
+        skelimg = cv.GaussianBlur(skelimg, (19, 19), 5)
+
+        th = cv.adaptiveThreshold(skelimg, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 35, 11)
+        th = cv.bitwise_not(th)
+
+        kernel = np.array([[0, 1, 1],
+                           [0, 1, 0],
+                           [1, 1, 0]], dtype='uint8')
+
+        th = cv.morphologyEx(th, cv.MORPH_CLOSE, kernel)
+
+        th = th == 255
+        th = skl(th)
+        th = th.astype(np.uint8)*255
+        th = cv.bitwise_not(th)
+        new_name = pathWDSKEL + os.path.splitext(os.path.basename(f))[0] + '.jpg'
+        cv.imwrite(new_name, th)
+
+    # JPG nach PPM konvertieren
+    filesJPG = [f for f in glob.glob(pathWDSKEL + "*.jpg")]
+    for f in filesJPG:
+        bild = Image.open(f)
+        new_name = pathWDSKEL + os.path.splitext(os.path.basename(f))[0] + '.ppm'
+        bild.save(new_name,'ppm')
+
+    # PPM nach SVG konvertieren
+    filesPPM = [f for f in glob.glob(pathWDSKEL + "*.ppm")]
+    def potrace(input_fname, output_fname):
+        if pot_buntstift:
+            subprocess.check_call(['potrace', '--flat', '--longcurve', '--alphamax', '1.34', '--turdsize', '120', '--blacklevel', '0.95', '-s', input_fname, '-o', output_fname])
+        else:
+            subprocess.check_call(['potrace', '--flat', '--turdsize', '120', '-s', input_fname, '-o', output_fname])
+
+    for f in filesPPM:
+        new_name = pathWDSKEL + os.path.splitext(os.path.basename(f))[0] + '.svg'
+        potrace(f, new_name)
+
+
 
 print('Zeichen aus Scan extrahiert und vektorisiert.')
 
