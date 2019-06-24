@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Umwandlung von vorliegenden Bildern in Vektorbilder der Einzelglyphen (bzw. in einen Font).
+"""
+Umwandlung von vorliegenden Bildern in Vektorbilder der Einzelglyphen (bzw. in einen Font).
 
 Entweder über den Aufruf dieser Datei (`Scan2SVG.py`) auch den zweiten Schritt der Font-Erstellung mitbestimmen, oder aber nur dieses Skript verwenden für die Vektorisierung und `SVG2Font.py` nachher manuell starten.
 """
@@ -12,7 +13,9 @@ import argparse
 import cv2 as cv
 from PIL import Image
 import numpy as np
+from skimage.morphology import square
 from skimage.morphology import skeletonize as skl
+from skimage.morphology import dilation as dil
 
 __author__ = "Christoph Pfeiffer"
 __license__ = "CC-BY-NC-SA-4.0"
@@ -211,6 +214,7 @@ if args.skel :
         th = th == 255
         th = skl(th)
         th = th.astype(np.uint8)*255
+        th = dil(th, square(9))
         th = cv.bitwise_not(th)
         new_name = pathWDSKEL + os.path.splitext(os.path.basename(f))[0] + '.jpg'
         cv.imwrite(new_name, th)
@@ -250,6 +254,18 @@ if name and version:
     info_datei = open(pathWD + "info.txt", "a")
     info_datei.write(str(args))
     info_datei.close()
+
+    if args.skel :
+        print('\nNun wird der SKEL-Font erstellt, \nda --name und --version angegeben wurden:')
+        subprocess.check_call(["python2", "SVG2Font.py", "--name", name, "--version", str(version), "--svgordner", pathWDSKEL])
+        print("... fertig!\n")
+        print("* Erfassungsbogen in Version: " + str(version))
+        print("* Schriftname: " + name)
+        print("* im Ordner: " + pathWDSKEL)
+        print("* Dateiname: " + name + "-Regular.sfd")
+        info_datei = open(pathWDSKEL + "info.txt", "a")
+        info_datei.write(str(args))
+        info_datei.close()
 
 # tidy up
 # ggfs. ppm-Dateien löschen
